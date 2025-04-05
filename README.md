@@ -19,7 +19,9 @@ The install-config.yaml file, required to initiate an Installer-Provisioned Infr
 <img width="948" alt="image" src="https://github.com/user-attachments/assets/495c7b8a-c23c-47cd-aded-4f59ebc7f462" />
 
 The diagram above shows the various pieces addressed in the YAML file. Cluster, infra and node details are fetched using Intersight APIs. The user input variables for:
+
 •	Cluster and infra are captured in the inventory.ini file within the folder inventory
+
 •	Each of the node details are captured in the host vars folder within inventory
 
 <img width="452" alt="image" src="https://github.com/user-attachments/assets/5d827c5e-1148-4c36-9d1d-aae7559b8efa" />
