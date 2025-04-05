@@ -12,12 +12,15 @@ The install-config.yaml file, required to initiate an Installer-Provisioned Infr
 •	Support dynamic provisioning – Leverages Intersight APIs to dynamically fetch infrastructure settings based on the target platform. 
 
 <img width="500" alt="image" src="https://github.com/user-attachments/assets/375a3c39-f7cc-40f7-9535-a7370a09ab14" />
+
 The diagram above shows the various pieces addressed in the YAML file. Cluster, infra and node details are fetched using Intersight APIs. The user input variables for:
 •	Cluster and infra are captured in the inventory.ini file within the folder inventory
 •	Each of the node details are captured in the host vars folder within inventory
+
 <img width="452" alt="image" src="https://github.com/user-attachments/assets/5d827c5e-1148-4c36-9d1d-aae7559b8efa" />
 
 The auto-generated YAML file follows Jinja template to render install-config.yaml file. The generated YAML file will be available in the outputs folder.
+
 <img width="452" alt="image" src="https://github.com/user-attachments/assets/fe194eb4-e84f-4608-9194-fd6e90bfd439" />
 
 # Prerequisites:
