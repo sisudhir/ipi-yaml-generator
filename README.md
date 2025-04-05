@@ -46,7 +46,7 @@ To use this code base to auto-generate install-config.yaml to bring up OpenShift
 2.	Install Cisco Intersight Ansible by running the command: 
 ```ansible-galaxy collection install```
 
-    **Note:** You can refer to the Cisco Intersight Ansible Collections documentation for setup information: cisco.intersighthttps://galaxy.ansible.com/ui/repo/published/cisco/intersight/
+    **Note:** You can refer to the Cisco Intersight Ansible Collections documentation for setup information: https://galaxy.ansible.com/ui/repo/published/cisco/intersight/
 
 4.	Provide user inputs for cluster, infra and hosts by following the example.
 5.	Generate API key and Secret for your Intersight account.
