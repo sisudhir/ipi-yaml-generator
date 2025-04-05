@@ -1,5 +1,4 @@
-# ipi-yaml-generator
-Automated YAML generation for OpenShift IPI install method
+# ipi-yaml-generator - Automated YAML generation for OpenShift IPI install method
 
 OpenShift Installer Provisioned Installation (IPI) follows a fully automated, opinionated approach where the OpenShift installer manages the entire infrastructure.
 This installation program uses each cluster host’s baseboard management controller (BMC) for cluster provisioning. 
@@ -15,6 +14,7 @@ The install-config.yaml file, required to initiate an Installer-Provisioned Infr
 
 •	Support dynamic provisioning – Leverages Intersight APIs to dynamically fetch infrastructure settings based on the target platform. 
 
+# Simple block diagram showing YAML generation for OpenShift IPI installation process
 
 <img width="948" alt="image" src="https://github.com/user-attachments/assets/495c7b8a-c23c-47cd-aded-4f59ebc7f462" />
 
@@ -31,6 +31,7 @@ The auto-generated YAML file follows Jinja template to render install-config.yam
 <img width="452" alt="image" src="https://github.com/user-attachments/assets/fe194eb4-e84f-4608-9194-fd6e90bfd439" />
 
 # Prerequisites:
+
 1.	Use ansible-playbook to create pools, policies, and profiles. Apply profiles to the baremetal servers. 
 Note – Infrastructure provisioning using Ansible using Intersight API is available in Ansible Galaxy: https://docs.ansible.com/ansible/devel/collections/cisco/intersight/ 
 2.	DNS, DHCP, client machine is configured and ready to use.
@@ -45,6 +46,8 @@ Note: You can refer to the Cisco Intersight Ansible Collections documentation fo
 5.	Provide the Intersight API key and Secret in the inventory > inventory.ini
 6.	Run the command- ansible-playbook -i inventory/inventory.ini server.yml
 7.	Access your auto-generated install-config.yaml file in the output folder.
+
+# A Simple diagram showing the YAML generation workflow using Ansible
 
 <img width="696" alt="image" src="https://github.com/user-attachments/assets/5c0d7310-e32f-443d-aaac-2f91567a29e1" />
 
