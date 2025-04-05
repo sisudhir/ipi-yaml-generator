@@ -32,20 +32,27 @@ The auto-generated YAML file follows Jinja template to render install-config.yam
 
 # Prerequisites:
 
-1.	Use ansible-playbook to create pools, policies, and profiles. Apply profiles to the baremetal servers. 
-Note – Infrastructure provisioning using Ansible using Intersight API is available in Ansible Galaxy: https://docs.ansible.com/ansible/devel/collections/cisco/intersight/ 
-2.	DNS, DHCP, client machine is configured and ready to use.
-3.	In this example code, static IP assignment is opted to suit the lab protocol. However, DHCP server can be referenced within the playbook for dynamic OS IP assignment.
-To use this code base to auto-generate install-config.yaml for bringing up OpenShift cluster using IPI install methods, follow these steps:
+1.	Create pools, policies, and profiles. Apply profiles to the baremetal servers. You can also choose to automate your infrastructure provisioning tasks using Ansible modules.
+
+    **Note:** Infrastructure provisioning using Intersight Ansible modules is available in Ansible Galaxy: https://docs.ansible.com/ansible/devel/collections/cisco/intersight/
+
+3.	DNS, DHCP, and client machine/Ansible workstation is configured and ready to use.
+4.	In this example code, static IP assignment is opted to suit the lab protocol. However, DHCP server can be referenced within the playbook for dynamic OS IP assignment.
+
+# Execution steps:
+
+To use this code base to auto-generate install-config.yaml to bring up OpenShift cluster using IPI install methods, follow these steps:
 1.	Git clone the respository.
 2.	Install Cisco Intersight Ansible by running the command: 
-ansible-galaxy collection install 
-Note: You can refer to the Cisco Intersight Ansible Collections documentation for setup information: cisco.intersighthttps://galaxy.ansible.com/ui/repo/published/cisco/intersight/
-3.	Provide user inputs for cluster, infra and hosts by following the example.
-4.	Generate API key and Secret for your Intersight account.
-5.	Provide the Intersight API key and Secret in the inventory > inventory.ini
-6.	Run the command- ansible-playbook -i inventory/inventory.ini server.yml
-7.	Access your auto-generated install-config.yaml file in the output folder.
+```ansible-galaxy collection install```
+
+    **Note:** You can refer to the Cisco Intersight Ansible Collections documentation for setup information: cisco.intersighthttps://galaxy.ansible.com/ui/repo/published/cisco/intersight/
+
+4.	Provide user inputs for cluster, infra and hosts by following the example.
+5.	Generate API key and Secret for your Intersight account.
+6.	Provide the Intersight API key and Secret in the inventory > inventory.ini
+7.	Run the command- ```ansible-playbook -i inventory/inventory.ini server.yml```
+8.	Access your auto-generated install-config.yaml file in the output folder.
 
 # YAML generation workflow using Ansible
 
