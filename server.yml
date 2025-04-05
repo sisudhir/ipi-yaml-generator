@@ -1,0 +1,177 @@
+# Play 1: Collect server data and build all_hosts
+- name: Collect server data and build all_hosts
+  hosts: Intersight_Servers
+  gather_facts: false
+  connection: local
+  collections:
+    - cisco.intersight
+
+  vars:
+    api_info: &api_info
+      api_private_key: "{{ api_private_key | default(omit) }}"
+      api_key_id: "{{ api_key_id | default(omit) }}"
+      api_uri: "{{ api_uri | default(omit) }}"
+      validate_certs: "{{ validate_certs | default(omit) }}"
+      state: "{{ state | default('present') }}"
+
+  tasks:
+    - name: Get server details
+      cisco.intersight.intersight_rest_api:
+        <<: *api_info
+        resource_path: "/compute/RackUnits"
+        query_params:
+          $filter: "Moid eq '{{ server_moid }}'"
+      register: srv_resp
+
+    - name: Extract serial number from server details
+      set_fact:
+        server_serial: "{{ srv_resp.api_response.Serial }}"
+
+    - name: Debug extracted serial
+      debug:
+        msg: "Serial number for {{ inventory_hostname }} is {{ server_serial }}"
+
+    - name: Set KVM IP fact
+      set_fact:
+        kvm_ip_address: "{{ srv_resp.api_response.KvmIpAddresses[0].Address | default('Not found') }}"
+
+    - name: Debug KVM IP address
+      debug:
+        msg: "KVM IP for {{ inventory_hostname }} is {{ kvm_ip_address }}"
+      when: debug_enabled | default(false)
+
+    - name: Build adapter Moids
+      set_fact:
+        adapter_moids: "{{ srv_resp.api_response.Adapters | map(attribute='Moid') | list }}"
+
+    - name: Get adapter details
+      cisco.intersight.intersight_rest_api:
+        <<: *api_info
+        resource_path: "/adapter/Units"
+        query_params:
+          $filter: "Moid eq '{{ item }}'"
+      loop: "{{ adapter_moids }}"
+      register: adapter_responses
+
+    - name: Find MLOM adapter
+      set_fact:
+        mlom_adapter: >-
+          {{ adapter_responses.results
+             | map(attribute='api_response')
+             | selectattr('PciSlot', 'equalto', 'MLOM')
+             | list | first }}
+
+    - name: Debug MLOM adapter
+      debug:
+        var: mlom_adapter
+      when: debug_enabled | default(false)
+
+    - name: Get HostEthInterface details
+      cisco.intersight.intersight_rest_api:
+        <<: *api_info
+        resource_path: "/adapter/HostEthInterfaces"
+        query_params:
+          $filter: "Moid eq '{{ item }}'"
+      loop: "{{ mlom_adapter.HostEthIfs | map(attribute='Moid') | list }}"
+      register: host_eth_data
+
+    - name: Debug host_eth_data
+      debug:
+        var: host_eth_data
+      when: debug_enabled | default(false)
+
+    - name: Find eth0 interface
+      set_fact:
+        eth0_interface: >-
+          {{ host_eth_data.results
+             | map(attribute='api_response')
+             | selectattr('Name', 'equalto', 'eth0')
+             | list | first }}
+
+    - name: Extract eth0 MAC address
+      set_fact:
+        eth0_mac: "{{ eth0_interface.MacAddress }}"
+
+    - name: Debug eth0_mac
+      debug:
+        msg: "Extracted MAC address for eth0: {{ eth0_mac }}"
+      when: debug_enabled | default(false)
+
+    - name: Build dynamic network config
+      set_fact:
+        network_config:
+          interfaces:
+            - name: "{{ os_interface_name }}"
+              type: ethernet
+              state: up
+              ipv4:
+                address:
+                  - ip: "{{ os_ip }}"
+                    prefix-length: 24
+                enabled: true
+          dns-resolver:
+            config:
+              server:
+                - "{{ dns_ip }}"
+          routes:
+            config:
+              - destination: 0.0.0.0/0
+                next-hop-address: "{{ gateway_ip }}"
+                next-hop-interface: "{{ os_interface_name }}"
+
+    - name: Prepare rendered host data
+      set_fact:
+        rendered_host:
+          name: "{{ inventory_hostname }}"
+          role: "{{ host_role }}"
+          bmc:
+            address: redfish-virtualmedia://{{ kvm_ip_address }}/redfish/v1/Systems/{{ server_serial }}
+            username: "{{ bmc_username }}"
+            password: "{{ bmc_password }}"
+            disableCertificateVerification: true
+          bootMACAddress: "{{ eth0_mac }}"
+          rootDeviceHints:
+            model: "{{ boot_device_type }}"
+          networkConfig: "{{ network_config }}"
+
+    - name: Save rendered_host as host fact
+      set_fact:
+        rendered_host_data: "{{ rendered_host }}"
+
+# Play 2: Render and validate install-config.yaml
+- name: Render and validate install-config.yaml
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Gather all rendered hosts from all servers
+      set_fact:
+        all_hosts: >-
+          {{ groups['Intersight_Servers'] | map('extract', hostvars, 'rendered_host_data') | list }}
+
+    - name: Debug all_hosts
+      debug:
+        var: all_hosts
+
+    - name: Fail if all_hosts is empty
+      fail:
+        msg: "No hosts were collected for install-config.yaml!"
+      when: all_hosts | length == 0
+
+    - name: Assign all_hosts to hosts for template compatibility
+      set_fact:
+        hosts: "{{ all_hosts }}"
+
+    - name: Render install-config.yaml
+      template:
+        src: templates/install-config.yaml.j2
+        dest: output/install-config.yaml
+
+    - name: Validate YAML syntax
+      command: python3 -c "import yaml; yaml.safe_load(open('output/install-config.yaml'))"
+      args:
+        chdir: "{{ playbook_dir }}"
+      register: install_check
+      failed_when: install_check.rc != 0
+      changed_when: false

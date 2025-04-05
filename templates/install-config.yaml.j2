@@ -1,0 +1,69 @@
+apiVersion: v1
+baseDomain: {{ base_domain }}
+metadata:
+  name: {{ cluster_name }}
+networking:
+  machineNetwork:
+    - cidr: {{ machine_network_cidr }}
+  networkType: OVNKubernetes
+compute:
+  - name: worker
+    replicas: {{ worker_replicas }}
+controlPlane:
+  name: master
+  replicas: {{ master_replicas }}
+  platform:
+    baremetal: {}
+platform:
+  baremetal:
+    apiVIPs:
+      - {{ api_vip }}
+    ingressVIPs:
+      - {{ ingress_vip }}
+    provisioningNetwork: Disabled
+    bootstrapExternalStaticIP: {{ bootstrap_ip }}
+    bootstrapExternalStaticGateway: {{ gateway_ip }}
+    bootstrapExternalStaticDNS: {{ dns_ip }}
+    hosts:
+{% for host in hosts %}
+      - name: {{ host.name }}
+        role: {{ host.role }}
+        bmc:
+          address: {{ host.bmc.address }}
+          username: {{ host.bmc.username }}
+          password: {{ host.bmc.password }}
+          disableCertificateVerification: {{ host.bmc.disableCertificateVerification | default(true) }}
+        bootMACAddress: {{ host.bootMACAddress }}
+        rootDeviceHints:
+          model: "{{ host.rootDeviceHints.model }}"
+        networkConfig:
+          interfaces:
+{% for iface in host.networkConfig.interfaces %}
+            - name: {{ iface.name }}
+              type: {{ iface.type }}
+              state: {{ iface.state }}
+              ipv4:
+                address:
+{% for addr in iface.ipv4.address %}
+                  - ip: {{ addr.ip }}
+                    prefix-length: {{ addr['prefix-length'] }}
+{% endfor %}
+                enabled: {{ iface.ipv4.enabled }}
+{% endfor %}
+          dns-resolver:
+            config:
+              server:
+{% for dns in host.networkConfig['dns-resolver'].config.server %}
+                - {{ dns }}
+{% endfor %}
+          routes:
+            config:
+{% for route in host.networkConfig.routes.config %}
+              - destination: {{ route.destination }}
+                next-hop-address: {{ route['next-hop-address'] }}
+                next-hop-interface: {{ route['next-hop-interface'] }}
+{% endfor %}
+{% endfor %}
+
+pullSecret: '{{ pull_secret }}'
+sshKey: '{{ ssh_key }}'

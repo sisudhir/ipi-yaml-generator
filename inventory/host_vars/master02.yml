@@ -1,0 +1,5 @@
+server_moid: 6789e0cd76752d31013c1b2a
+inventory_hostname: ocp-m2
+model: UCSC-C240-M6L
+host_role: master
+os_ip: 192.168.13.xx
