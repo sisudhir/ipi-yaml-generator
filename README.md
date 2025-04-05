@@ -11,7 +11,7 @@ The install-config.yaml file, required to initiate an Installer-Provisioned Infr
 •	Minimize human errors – Reduces manual intervention, preventing misconfigurations and improving stability.
 •	Support dynamic provisioning – Leverages Intersight APIs to dynamically fetch infrastructure settings based on the target platform. 
 
-<img width="500" alt="image" src="https://github.com/user-attachments/assets/375a3c39-f7cc-40f7-9535-a7370a09ab14" />
+<img width="948" alt="image" src="https://github.com/user-attachments/assets/495c7b8a-c23c-47cd-aded-4f59ebc7f462" />
 
 The diagram above shows the various pieces addressed in the YAML file. Cluster, infra and node details are fetched using Intersight APIs. The user input variables for:
 •	Cluster and infra are captured in the inventory.ini file within the folder inventory
