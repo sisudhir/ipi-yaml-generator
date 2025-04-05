@@ -47,7 +47,7 @@ Note: You can refer to the Cisco Intersight Ansible Collections documentation fo
 6.	Run the command- ansible-playbook -i inventory/inventory.ini server.yml
 7.	Access your auto-generated install-config.yaml file in the output folder.
 
-# A Simple diagram showing the YAML generation workflow using Ansible
+# YAML generation workflow using Ansible
 
 <img width="696" alt="image" src="https://github.com/user-attachments/assets/5c0d7310-e32f-443d-aaac-2f91567a29e1" />
 
