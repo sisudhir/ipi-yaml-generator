@@ -6,10 +6,15 @@ This installation program uses each cluster host’s baseboard management contro
 The install-config.yaml file, required to initiate an Installer-Provisioned Infrastructure (IPI) installation, contains essential details about the cluster, infrastructure, and nodes. The attempt to auto-generate the "install-config.yaml" file leverages Intersight APIs and Ansible, offering several advantages:
 
 •	Speed up deployment – Automates cluster setup, reducing provisioning time. 
+
 •	Improve reliability – Ensures consistent configurations across multiple clusters.
+
 •	Enable repeatable deployments – Facilitates consistent deployments for testing, validation, and production environments.
+
 •	Minimize human errors – Reduces manual intervention, preventing misconfigurations and improving stability.
+
 •	Support dynamic provisioning – Leverages Intersight APIs to dynamically fetch infrastructure settings based on the target platform. 
+
 
 <img width="948" alt="image" src="https://github.com/user-attachments/assets/495c7b8a-c23c-47cd-aded-4f59ebc7f462" />
 
